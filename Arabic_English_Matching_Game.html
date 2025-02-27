@@ -4,375 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arabic-English Matching Game</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&display=swap');
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f0f7ff;
-            background-image: linear-gradient(135deg, #f0f7ff 0%, #e6f0ff 100%);
-        }
-        .container {
-            background-color: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s ease;
-        }
-        .container:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            border-bottom: 3px solid #f0f0f0;
-            padding-bottom: 15px;
-        }
-        .header h1 {
-            color: #2c3e50;
-            font-weight: 700;
-            margin: 0;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-            background: linear-gradient(45deg, #2c3e50, #4a6070);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .stats-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 8px;
-        }
-        .score, .mistakes {
-            padding: 10px 18px;
-            border-radius: 30px;
-            font-weight: bold;
-            color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        .score {
-            background: linear-gradient(to right, #43c6ac, #28a745);
-        }
-        .score:hover {
-            transform: scale(1.05);
-        }
-        .mistakes {
-            background: linear-gradient(to right, #ff416c, #ff4b2b);
-        }
-        .mistakes:hover {
-            transform: scale(1.05);
-        }
-        .done-button {
-            background: linear-gradient(to right, #8e2de2, #4a00e0);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 8px;
-            box-shadow: 0 4px 8px rgba(74, 0, 224, 0.3);
-            transition: all 0.3s ease;
-        }
-        .done-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(74, 0, 224, 0.4);
-        }
-        .question {
-            font-size: 50px;
-            text-align: center;
-            margin: 40px 0;
-            direction: rtl;
-            font-family: 'Scheherazade New', 'Traditional Arabic', serif;
-            color: #333;
-            line-height: 1.4;
-            padding: 20px;
-            background-color: #f9f9f9;
-            border-radius: 12px;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
-            animation: fadeInQuestion 0.8s ease-out;
-        }
-        @keyframes fadeInQuestion {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .options {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 12px;
-        }
-        .option {
-            background-color: #f8f9fa;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            padding: 18px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 18px;
-            position: relative;
-            overflow: hidden;
-        }
-        .option:hover {
-            background-color: #e9ecef;
-            transform: translateY(-4px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border-color: #adb5bd;
-        }
-        .option:before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(120deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0) 70%);
-            transform: translateX(-100%);
-            transition: all 0.6s ease;
-        }
-        .option:hover:before {
-            transform: translateX(100%);
-        }
-        .correct {
-            background: linear-gradient(to right, #43c6ac, #28a745);
-            color: white;
-            border-color: #28a745;
-            animation: correctPulse 1s;
-        }
-        @keyframes correctPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        .incorrect {
-            background: linear-gradient(to right, #ff416c, #ff4b2b);
-            color: white;
-            border-color: #ff4b2b;
-            animation: shake 0.5s;
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
-        }
-        .difficulty-selector {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
-        .difficulty-selector label {
-            margin-bottom: 15px;
-            font-weight: bold;
-            font-size: 18px;
-            color: #2c3e50;
-        }
-        .difficulty-slider {
-            width: 80%;
-            margin-bottom: 25px;
-            height: 10px;
-            -webkit-appearance: none;
-            appearance: none;
-            background: linear-gradient(to right, #43c6ac, #8e2de2);
-            border-radius: 5px;
-            outline: none;
-        }
-        .difficulty-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background: #4a00e0;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-            transition: all 0.2s ease;
-        }
-        .difficulty-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.1);
-            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
-        }
-        .start-button, .download-button {
-            background: linear-gradient(to right, #43c6ac, #28a745);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 15px;
-            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
-            transition: all 0.3s ease;
-        }
-        .start-button:hover, .download-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(40, 167, 69, 0.4);
-        }
-        .next-button {
-            background: linear-gradient(to right, #2196F3, #0d6efd);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 25px;
-            display: none;
-            box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
-            transition: all 0.3s ease;
-        }
-        .next-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(13, 110, 253, 0.4);
-        }
-        .difficulty-display {
-            font-style: italic;
-            color: #6c757d;
-            margin-top: 10px;
-            font-size: 16px;
-        }
-        .feedback {
-            text-align: center;
-            margin: 20px 0;
-            font-weight: bold;
-            min-height: 30px;
-            font-size: 22px;
-            transition: all 0.3s ease;
-            animation: fadeInUp 0.5s;
-        }
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .loading {
-            text-align: center;
-            margin: 30px 0;
-            padding: 30px;
-            background-color: #f9f9f9;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
-        }
-        .error-message {
-            color: #ff4b2b;
-            text-align: center;
-            padding: 25px;
-            background-color: #ffebee;
-            border-radius: 12px;
-            margin: 25px 0;
-            box-shadow: 0 4px 10px rgba(255, 75, 43, 0.1);
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.6);
-            animation: fadeIn 0.3s;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 8% auto;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            width: 80%;
-            max-width: 650px;
-            animation: slideIn 0.4s;
-        }
-        @keyframes slideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-        .close:hover,
-        .close:focus {
-            color: #333;
-            text-decoration: none;
-        }
-        .session-stats {
-            margin: 25px 0;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-        .log-container {
-            max-height: 350px;
-            overflow-y: auto;
-            margin: 25px 0;
-            padding: 15px;
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
-            background-color: #f9f9f9;
-            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
-        }
-        .log-entry {
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #e9ecef;
-            transition: all 0.2s ease;
-        }
-        .log-entry:hover {
-            background-color: #f0f0f0;
-        }
-        .log-entry.correct {
-            border-left: 5px solid #28a745;
-            padding-left: 15px;
-        }
-        .log-entry.incorrect {
-            border-left: 5px solid #ff4b2b;
-            padding-left: 15px;
-        }
-        .copy-area {
-            width: 100%;
-            height: 120px;
-            margin-top: 15px;
-            padding: 12px;
-            resize: none;
-            font-family: monospace;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            background-color: #f8f9fa;
-            font-size: 14px;
-        }
-        .buttons-container {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 25px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
@@ -388,7 +20,7 @@
         <div id="loading-screen">
             <div class="loading">
                 <h2>Loading Arabic-English Data...</h2>
-                <p>Please wait while we load the sentences from ara.txt</p>
+                <p>Please wait while we load</p>
             </div>
         </div>
 
@@ -415,6 +47,18 @@
             <div class="feedback" id="feedback"></div>
             <div class="options" id="options-container"></div>
             <button class="next-button" id="next-question">Next Question</button>
+        </div>
+    </div>
+
+    <!-- Startup Modal -->
+    <div id="startModal" class="modal game-mode-modal">
+        <div class="modal-content">
+            <h2>Select Game Mode</h2>
+            <p>Choose the type of matching game you'd like to play:</p>
+            <div class="buttons-container">
+                <button id="sentenceGameButton" class="start-button sentence-button">Sentence Matching Game (Dialect Agnostic)</button>
+                <button id="wordGameButton" class="start-button word-button">Word Matching Game (Classical Arabic)</button>
+            </div>
         </div>
     </div>
     
@@ -447,6 +91,7 @@
     <script>
         // Game variables
         let sentences = [];
+        let isWordGame = true;
         let currentIndex = 0;
         let score = 0;
         let mistakes = 0;
@@ -482,11 +127,9 @@
         const copyText = document.getElementById('copy-text');
         const downloadLogButton = document.getElementById('download-log');
         const newGameButton = document.getElementById('new-game');
-
-        // Automatically load the ara.txt file when the page loads
-        window.addEventListener('DOMContentLoaded', function() {
-            loadAraFile();
-        });
+        const startModal = document.getElementById('startModal');
+        const sentenceGameButton = document.getElementById('sentenceGameButton');
+        const wordGameButton = document.getElementById('wordGameButton');
 
         // Load the ara.txt file
         function loadAraFile() {
@@ -508,7 +151,60 @@
                 });
         }
 
-        // Parse file content
+        // Function to load FSTU.csv
+        function loadFSTUFile() {
+            fetch('FSTU.csv')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load FSTU.csv file');
+                    }
+                    return response.text();
+                })
+                .then(content => {
+                    parseCSVContent(content);
+                })
+                .catch(error => {
+                    console.error('Error loading FSTU.csv:', error);
+                    loadingScreen.style.display = 'none';
+                    errorScreen.style.display = 'block';
+                    errorMessage.textContent = error.message || 'Unable to load FSTU.csv. Please make sure the file is in the same directory as this HTML file.';
+                });
+        }
+
+        // Parse CSV file content
+        function parseCSVContent(content) {
+            sentences = [];
+            const lines = content.split('\n').map(line => line.trim()).filter(line => line !== ''); // Split by lines, trim whitespace, and remove empty lines
+
+            // Iterate through the lines in pairs
+            for (let i = 0; i < lines.length; i += 2) {
+                const arabic = lines[i].replace(/,$/, '').trim(); // Remove trailing commas and trim
+                const english = lines[i + 1]?.replace(/,$/, '').trim(); // Remove trailing commas and trim
+
+                // Ensure both Arabic and English lines exist
+                if (arabic && english) {
+                    sentences.push({
+                        arabic: arabic,
+                        english: english
+                    });
+                } else {
+                    console.warn(`Skipping incomplete pair at line ${i + 1}:`, { arabic, english });
+                }
+            }
+
+            loadingScreen.style.display = 'none';
+            
+            if (sentences.length > 0) {
+                setupScreen.style.display = 'block';
+                dataStats.textContent = `Loaded ${sentences.length} sentences`;
+            } else {
+                errorScreen.style.display = 'block';
+                errorMessage.textContent = 'No valid data found in FSTU.csv. Please check the file format.';
+            }
+
+        }
+
+        // Parse text file content
         function parseFileContent(content) {
             sentences = [];
             const lines = content.split('\n');
@@ -554,6 +250,11 @@
 
         // Get sentences based on difficulty level with randomization
         function getSentencesForDifficulty(difficulty) {
+
+            if (sentences.length === 0) {
+                console.error("No sentences loaded. Cannot calculate difficulty range.");
+                return null; 
+            }
             const totalSentences = sentences.length;
             
             // Define segment size for each difficulty level
@@ -572,22 +273,85 @@
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        // Get a set of options for the current question (including the correct answer)
-        function getOptions(correctAnswer) {
+        function getOptions(correctAnswer, difficultyLevel) {
             const options = [correctAnswer];
             const usedIndices = new Set([currentPosition]);
-            
+
+            // Tokenize the correct answer
+            const correctAnswerTokens = correctAnswer.split(/\s+/);
+            const correctTokenCount = correctAnswerTokens.length;
+
+            // Determine the minimum number of matching tokens based on difficulty
+            const minMatchingTokens = Math.min(2, Math.ceil(difficultyLevel / 5)); // Example: 1 token for low difficulty, 2 for high
+
+            // Check if the correct answer ends with a question mark
+            const endsWithQuestionMark = endsWithCharacter(correctAnswer, '?');
+
             // Add 3 more random options
+            let attempts = 0; // Track the number of attempts to find valid options
+            const maxAttempts = 5; // Prevent infinite loops by limiting attempts
+
             while (options.length < 4 && options.length < sentences.length) {
                 const randomIndex = getRandomInt(0, sentences.length - 1);
-                if (!usedIndices.has(randomIndex) && sentences[randomIndex].english !== correctAnswer) {
-                    options.push(sentences[randomIndex].english);
-                    usedIndices.add(randomIndex);
+                const randomSentence = sentences[randomIndex].english;
+
+                if (isWordGame) {
+                    // For Word Matching Game, just ensure no duplicates and avoid using the correct answer
+                    if (
+                        !usedIndices.has(randomIndex) && // Avoid duplicates
+                        randomSentence !== correctAnswer // Avoid using the correct answer itself
+                    ) {
+                        options.push(randomSentence);
+                        usedIndices.add(randomIndex);
+                    }
+                } else {
+                    // Tokenize the random sentence
+                    const randomSentenceTokens = randomSentence.split(/\s+/);
+                    const randomTokenCount = randomSentenceTokens.length;
+
+                    // Ensure the random option matches the grammatical structure (punctuation), token similarity, and token length
+                    if (
+                        !usedIndices.has(randomIndex) && // Avoid duplicates
+                        randomSentence !== correctAnswer && // Avoid using the correct answer itself
+                        (!endsWithQuestionMark || endsWithCharacter(randomSentence, '?')) && // Punctuation match
+                        countMatchingTokens(correctAnswer, randomSentence) >= minMatchingTokens && // Token similarity
+                        isTokenLengthSimilar(correctTokenCount, randomTokenCount) // Token length similarity
+                    ) {
+                        options.push(randomSentence);
+                        usedIndices.add(randomIndex);
+                    }
+                    attempts++; // Increment the attempt counter
                 }
             }
-            
+
             // Shuffle options
             return options.sort(() => Math.random() - 0.5);
+        }
+
+        // Helper function to check if two token counts are similar
+        function isTokenLengthSimilar(correctTokenCount, randomTokenCount) {
+            if (correctTokenCount <= 2) {
+                // Strict match for 1 or 2 tokens
+                return correctTokenCount === randomTokenCount;
+            } else if (correctTokenCount === 3) {
+                // Allow ±1 token difference for 3 tokens
+                return Math.abs(correctTokenCount - randomTokenCount) <= 1;
+            } else {
+                // Looser restriction for >3 tokens
+                return Math.abs(correctTokenCount - randomTokenCount) <= 2;
+            }
+        }
+
+        // Helper function to check if a string ends with a specific character
+        function endsWithCharacter(sentence, character) {
+            return sentence.trim().endsWith(character);
+        }
+        
+        // Helper function to count matching tokens between two sentences
+        function countMatchingTokens(sentence1, sentence2) {
+            const tokens1 = sentence1.toLowerCase().split(/\s+/); // Split into words
+            const tokens2 = sentence2.toLowerCase().split(/\s+/);
+            return tokens1.filter(token => tokens2.includes(token)).length; // Count matches
         }
 
         // Setup a new question
@@ -608,7 +372,7 @@
             }, 200);
             
             // Generate and display options
-            const options = getOptions(currentSentence.english);
+            const options = getOptions(currentSentence.english, difficultyLevel);
             
             // Add options with staggered animation
             options.forEach((option, index) => {
@@ -776,10 +540,30 @@
             
             summaryModal.style.display = 'none';
             gameScreen.style.display = 'none';
-            setupScreen.style.display = 'block';
+            startModal.style.display = 'block';
         }
 
         // Event Listeners
+
+        // Show the modal when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            startModal.style.display = 'block'; // Show the modal
+
+            // Handle Sentence Matching Game selection
+            sentenceGameButton.addEventListener('click', () => {
+                startModal.style.display = 'none'; // Hide the modal
+                isWordGame = false;
+                loadAraFile(); // Load ara.txt
+            });
+
+            // Handle Word Matching Game selection
+            wordGameButton.addEventListener('click', () => {
+                startModal.style.display = 'none'; // Hide the modal
+                isWordGame = true;
+                loadFSTUFile(); // Load FSTU.csv
+            });
+        });
+
         difficultySlider.addEventListener('input', updateDifficultyText);
         
         startButton.addEventListener('click', () => {

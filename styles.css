@@ -405,3 +405,23 @@ body {
 .word-button:hover {
     background: linear-gradient(to right, #b34700, #c68c53); /* Even darker orange on hover */
 }
+
+/* Custom styling for the audio button */
+.play-button {
+    font-size: 2rem; /* Larger microphone symbol */
+    background-color: #509cec; /* Blue background */
+    color: white; /* White icon */
+    border: none; /* Remove borders */
+    border-radius: 50%; /* Make it circular */
+    width: 50px; /* Fixed width */
+    height: 50px; /* Fixed height */
+    display: flex; /* Center content */
+    align-items: center; /* Vertical alignment */
+    justify-content: center; /* Horizontal alignment */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+.play-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}

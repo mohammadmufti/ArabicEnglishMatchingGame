@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arabic-English Matching Game</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
 </head>
 <body>
     <div class="container">
@@ -479,6 +480,26 @@
             setTimeout(() => {
                 arabicText.textContent = currentSentence.arabic;
                 arabicText.style.opacity = 1;
+
+            // Create Play Button
+            const playButton = document.createElement('button');
+            playButton.innerHTML = '🔊'; // Microphone symbol
+            playButton.classList.add('play-button');
+
+            // Preprocess the Arabic text to include only the part before " ج "
+            let truncatedText = currentSentence.arabic;
+            const separator = " ج "; // The separator to look for
+            if (truncatedText.includes(separator)) {
+                truncatedText = truncatedText.split(separator)[0].trim(); // Keep only the part before " ج "
+            }            
+            
+            // Attach the onclick event with the truncated text
+            playButton.onclick = () => responsiveVoice.speak(truncatedText, "Arabic Male");
+
+            // Append the button to the arabicText container
+            arabicText.style.position = 'relative';
+            arabicText.appendChild(playButton);
+
             }, 200);
             
             // Generate and display options

@@ -178,9 +178,14 @@
 
             // Iterate through the lines in pairs
             for (let i = 0; i < lines.length; i += 2) {
-                const arabic = lines[i].replace(/,$/, '').trim(); // Remove trailing commas and trim
-                const english = lines[i + 1]?.replace(/,$/, '').trim(); // Remove trailing commas and trim
+                const arabic = lines[i]
+                    .replace(/,$/, '') // Remove trailing commas
+                    .replace(/^"|"$/g, '') // Remove quotation marks at the start or end
+                    .trim(); // Trim whitespace
 
+                const english = lines[i + 1]?.replace(/,$/, '') // Remove trailing commas
+                    .replace(/^"|"$/g, '') // Remove quotation marks at the start or end
+                    .trim(); // Trim whitespace
                 // Ensure both Arabic and English lines exist
                 if (arabic && english) {
                     sentences.push({
@@ -201,7 +206,6 @@
                 errorScreen.style.display = 'block';
                 errorMessage.textContent = 'No valid data found in FSTU.csv. Please check the file format.';
             }
-
         }
 
         // Parse text file content
@@ -284,8 +288,114 @@
             // Determine the minimum number of matching tokens based on difficulty
             const minMatchingTokens = Math.min(2, Math.ceil(difficultyLevel / 5)); // Example: 1 token for low difficulty, 2 for high
 
-            // Check if the correct answer ends with a question mark
+            // Check if the correct answer ends with a question mark - edge case
             const endsWithQuestionMark = endsWithCharacter(correctAnswer, '?');
+
+            // Specific one word edge cases
+            const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+            const islamicMonths = [
+                "Rajab", "Shaban", "Ramadhan", "Shawwal", "Zul Qadah", "Zul Hijjah",
+                "Muharram", "Safar", "Rabi al-Awal", "Rabi at-Thani", "Jumada al-Awal", "Jumada at-Thani"
+            ];
+            const ones = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+            const teens = ["eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+            const tens = ["twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety", "one hundred"];
+
+            if (isWordGame && correctAnswer.startsWith("to")) {
+                let toCount = 0; // Count how many wrong answers start with "to"
+
+                // Ensure at least 2 wrong answers start with "to"
+                while (toCount < 2 && options.length < 4) {
+                    const randomIndex = getRandomInt(0, sentences.length - 1);
+                    const randomSentence = sentences[randomIndex].english;
+
+                    // Check if the random sentence starts with "to" and isn't already used
+                    if (
+                        !usedIndices.has(randomIndex) && // Avoid duplicates
+                        randomSentence !== correctAnswer && // Avoid using the correct answer itself
+                        randomSentence.startsWith("to") // Ensure it starts with "to"
+                    ) {
+                        options.push(randomSentence);
+                        usedIndices.add(randomIndex);
+                        toCount++;
+                    }
+                }
+
+                // If we still don't have enough "to" answers after exhausting the loop, relax the condition
+                if (toCount < 2) {
+                    console.warn("Not enough 'to' answers found. Relaxing constraints.");
+                }
+            }
+
+            // If the correct answer is a day of the week
+            if (daysOfWeek.includes(correctAnswer)) {
+                const wrongAnswers = [];
+                const availableDays = daysOfWeek.filter(day => day !== correctAnswer); // Exclude the correct answer
+
+                while (wrongAnswers.length < 3 && availableDays.length > 0) {
+                    const randomIndex = getRandomInt(0, availableDays.length - 1);
+                    const randomDay = availableDays.splice(randomIndex, 1)[0]; // Remove the selected day to avoid duplicates
+                    wrongAnswers.push(randomDay);
+                }
+
+                options.push(...wrongAnswers); // Add the wrong answers to the options array
+            }
+            
+            // If the correct answer is a particular month
+            if (islamicMonths.includes(correctAnswer)) {
+                const wrongAnswers = [];
+                const availableMonths = islamicMonths.filter(month => month !== correctAnswer); // Exclude the correct answer
+
+                while (wrongAnswers.length < 3 && availableMonths.length > 0) {
+                    const randomIndex = getRandomInt(0, availableMonths.length - 1);
+                    const randomMonth = availableMonths.splice(randomIndex, 1)[0]; // Remove the selected month to avoid duplicates
+                    wrongAnswers.push(randomMonth);
+                }
+
+                options.push(...wrongAnswers); // Add the wrong answers to the options array
+            }
+
+            // Check if correctAnswer is in the "ones" set
+            if (ones.includes(correctAnswer)) {
+                const wrongAnswers = [];
+                const availableNumbers = ones.filter(number => number !== correctAnswer); // Exclude the correct answer
+
+                while (wrongAnswers.length < 3 && availableNumbers.length > 0) {
+                    const randomIndex = getRandomInt(0, availableNumbers.length - 1);
+                    const randomNumber = availableNumbers.splice(randomIndex, 1)[0]; // Remove the selected number to avoid duplicates
+                    wrongAnswers.push(randomNumber);
+                }
+
+                options.push(...wrongAnswers); // Add the wrong answers to the options array
+            }
+
+            // Check if correctAnswer is in the "teens" set
+            else if (teens.includes(correctAnswer)) {
+                const wrongAnswers = [];
+                const availableNumbers = teens.filter(number => number !== correctAnswer); // Exclude the correct answer
+
+                while (wrongAnswers.length < 3 && availableNumbers.length > 0) {
+                    const randomIndex = getRandomInt(0, availableNumbers.length - 1);
+                    const randomNumber = availableNumbers.splice(randomIndex, 1)[0]; // Remove the selected number to avoid duplicates
+                    wrongAnswers.push(randomNumber);
+                }
+
+                options.push(...wrongAnswers); // Add the wrong answers to the options array
+            }
+
+            // Check if correctAnswer is in the "tens" set
+            else if (tens.includes(correctAnswer)) {
+                const wrongAnswers = [];
+                const availableNumbers = tens.filter(number => number !== correctAnswer); // Exclude the correct answer
+
+                while (wrongAnswers.length < 3 && availableNumbers.length > 0) {
+                    const randomIndex = getRandomInt(0, availableNumbers.length - 1);
+                    const randomNumber = availableNumbers.splice(randomIndex, 1)[0]; // Remove the selected number to avoid duplicates
+                    wrongAnswers.push(randomNumber);
+                }
+
+                options.push(...wrongAnswers); // Add the wrong answers to the options array
+            }
 
             // Add 3 more random options
             let attempts = 0; // Track the number of attempts to find valid options

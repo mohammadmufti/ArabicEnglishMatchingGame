@@ -425,3 +425,22 @@ body {
 .play-button:hover {
     background-color: #0056b3; /* Darker blue on hover */
 }
+
+footer {
+    text-align: center; /* Center-align the text */
+    font-size: 0.8em; /* Make the text smaller */
+    margin-top: 20px; /* Add some space above the footer */
+    padding: 10px; /* Add padding inside the footer */
+    background-color: #f9f9f9; /* Light background color */
+    border-top: 1px solid #ddd; /* Add a border at the top */
+}
+
+/* Style for hyperlinks in the footer */
+footer a {
+    color: #007BFF; /* Blue color for links */
+    text-decoration: none; /* Remove underline */
+}
+
+footer a:hover {
+    text-decoration: underline; /* Underline on hover */
+}

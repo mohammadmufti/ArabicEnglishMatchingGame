@@ -96,7 +96,7 @@ function parseWords(text) {
     const lines = text.trim().split('\n');
     const pairs = [];
     for (let i = 0; i < lines.length; i += 2) {
-        console.log('Arabic:', lines[i], 'English:', lines[i + 1]);
+        //console.log('Arabic:', lines[i], 'English:', lines[i + 1]);
         pairs.push({
             arabic: lines[i].trim().replace(/,$/, '').replace(/^"|"$/g, '').replace(/""/g, '"'),
             english: lines[i + 1].replace(/[\r\n]+/g, '').replace(/,$/, '').replace(/^"|"$/g, '').replace(/""/g, '"')

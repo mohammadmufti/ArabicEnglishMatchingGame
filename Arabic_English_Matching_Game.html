@@ -91,14 +91,17 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>About the Game:</strong> The Arabic-English Matching Game is designed to help learners practice matching Arabic words and sentences with their English translations across different modes, including Sentence Matching, Word Matching, and Quran Verbs Matching.</p>
+                    <p><strong>About the Game:</strong> The Arabic-English Matching Game is designed to help learners practice matching Arabic words and sentences with their English translations across different modes, including Sentence Matching, Fusha Word Matching, and Quranic word Matching. The best way to play is to try and decipher the sentence/word before even considering the multiple choice options.</p>
+                    <p><strong>Difficulty:</strong> All game modes have the option to select difficulty. For sentence matching, longer sentences are considered more difficult. Word matching difficulty maps to vocab introduction in the FSTU Arabic Textbook. For Quranic mode, it is determined by frequency.</p>
+                    <p><strong>Dialects:</strong> Sentence matching is dialect agnostic and will contain expressions across dialects. Word matching and Quranic modes will prefer Fusha / Classical Arabic</p>
                     <p><strong>Data Sources:</strong></p>
                     <ul>
                         <li><a href="https://alqalaminstitute.org" target="_blank">Al-Qalam Institute</a>: Wordlist extracted from the FSTU Arabic Textbooks</li>
-                        <li><a href="https://tatoeba.org" target="_blank">Tatoeba</a>: Provides sentence-based learning materials from Arabic speakers across the world. The data set used here is dialect agnostic.</li>
-                        <li><a href="https://corpus.quran.com" target="_blank">Quran Corpus</a>: Supplies verb and linguistic data from the Quran for the Quran Verbs mode.</li>
+                        <li><a href="https://tatoeba.org" target="_blank">Tatoeba</a>: Provides sentence-based learning materials from Arabic speakers across the world.</li>
+                        <li><a href="https://corpus.quran.com" target="_blank">Quran Corpus</a>: Supplies words, glosses and linguistic data from the Quran..</li>
                     </ul>
                     <p><strong>Data Structure:</strong> The game uses CSV and text files with Arabic-English pairs. Sentence mode uses tab-separated files, Word mode pairs lines, and Quran Verbs mode uses comma-separated CSV files. More on data sources on my Github. Please let me know if you catch any errors/bugs!</p>
+                    <p><strong>TTS Logic:</strong> Prioritizes ResponsiveVoice but falls back to system in case of timeout or failure.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

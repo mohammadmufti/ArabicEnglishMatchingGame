@@ -249,18 +249,102 @@ function displayPair(pair, segment) {
     });
 }
 
-// Function to handle the speak button click
+// Function to handle the speak button click with robust fallback
 function handleSpeakButtonClick(arabicText) {
-    // Check if the text contains "ج"
     if (arabicText.includes(" ج ")) {
-        // Truncate all text to the right of "ج" (including "ج")
         arabicText = arabicText.split(" ج ")[0].trim();
     }
 
-    // Pass the (possibly truncated) text to the API
-    responsiveVoice.speak(arabicText, gameConfig.TTS_VOICE, {rate: gameConfig.TTS_SPEED});
+    function speakWithFallback(text) {
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ar-SA'; // Arabic (Saudi Arabia)
+
+            // Get available voices first
+            const voices = window.speechSynthesis.getVoices();
+
+            // Determine if we should prioritize a female voice
+            const preferFemale = gameConfig.TTS_VOICE.toLowerCase().includes('female');
+            let selectedVoice;
+
+            if (preferFemale) {
+                console.log("Preferring a female Arabic voice based on TTS_VOICE:", gameConfig.TTS_VOICE);
+                selectedVoice = voices.find(voice => 
+                    voice.lang.includes('ar') && 
+                    (voice.name.toLowerCase().includes('female') || 
+                     voice.name.includes('Salma') || 
+                     voice.name.includes('Leila') || 
+                     voice.name.includes('Laila') || 
+                     voice.name.includes('Zainab'))
+                );
+                if (selectedVoice) {
+                    console.log("Selected female Arabic voice for fallback:", selectedVoice.name);
+                } else {
+                    console.log("No female Arabic voice found, falling back to any Arabic voice.");
+                }
+            }
+
+            // If no female voice (or not preferring female), use any Arabic voice
+            if (!selectedVoice) {
+                selectedVoice = voices.find(voice => voice.lang.includes('ar'));
+                if (selectedVoice) {
+                    console.log("Selected Arabic voice for fallback:", selectedVoice.name);
+                } else {
+                    console.log("No Arabic voice available, using default voice.");
+                }
+            }
+
+            if (selectedVoice) utterance.voice = selectedVoice;
+            utterance.rate = gameConfig.TTS_SPEED || 1.0;
+            utterance.onerror = (event) => console.error("SpeechSynthesis error:", event.error);
+            window.speechSynthesis.speak(utterance);
+        } else {
+            console.log("Web Speech API not supported in this browser.");
+        }
+    }
+
+    if (typeof responsiveVoice !== 'undefined' && responsiveVoice.voiceSupport()) {
+        try {
+            let hasPlayed = false;
+            let hasFallbackTriggered = false;
+
+            responsiveVoice.speak(arabicText, gameConfig.TTS_VOICE, {
+                rate: gameConfig.TTS_SPEED,
+                onstart: () => {
+                    hasPlayed = true;
+                    console.log("ResponsiveVoice started speaking.");
+                },
+                onend: () => {
+                    hasPlayed = true;
+                    console.log("ResponsiveVoice finished speaking.");
+                },
+                onerror: (e) => {
+                    console.log("ResponsiveVoice error caught in onerror:", e);
+                    console.log("Falling back to Web Speech API.");
+                    speakWithFallback(arabicText);
+                }
+            });
+
+            setTimeout(() => {
+                if (!hasPlayed && !hasFallbackTriggered) {
+                    console.log("ResponsiveVoice failed to play (likely OpaqueResponseBlocking), falling back to Web Speech API.");
+                    responsiveVoice.cancel();
+                    hasFallbackTriggered = true;
+                    speakWithFallback(arabicText);
+                }
+            }, 7000); // 6-second delay
+        } catch (e) {
+            console.log("ResponsiveVoice failed synchronously:", e);
+            console.log("Falling back to Web Speech API.");
+            speakWithFallback(arabicText);
+        }
+    } else {
+        console.log("ResponsiveVoice not available, using Web Speech API.");
+        speakWithFallback(arabicText);
+    }
 }
 
+// Validates answer selection
 function checkAnswer(selected, pair, segment) {
     const isCorrect = selected === pair.english;
     state.answers[isCorrect ? 'correct' : 'incorrect'].push({ arabic: pair.arabic, english: pair.english });

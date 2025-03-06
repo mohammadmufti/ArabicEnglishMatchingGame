@@ -4,96 +4,127 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Arabic-English Matching Game</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <script src="https://code.responsivevoice.org/responsivevoice.js?key=[KEY]]></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&family=Poppins:wght@400;600&family=Amiri:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"> <!-- Bootstrap Icons -->
+    <script src="https://code.responsivevoice.org/responsivevoice.js?key=t5zPQFOD"></script> <!-- Replace with your ResponsiveVoice API key -->
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>Arabic-English Matching Game</h1>
-            <div class="stats-container">
-                <div class="score">Correct: <span id="score">0</span></div>
-                <div class="mistakes">Mistakes: <span id="mistakes">0</span></div>
-                <button class="done-button" id="done-button">I'm Done</button>
-            </div>
-        </div>
-        
-        <div id="loading-screen">
-            <div class="loading">
-                <h2>Loading Arabic-English Data...</h2>
-                <p>Please wait while we load</p>
-            </div>
-        </div>
+    <!-- Header -->
+    <header class="container text-center py-4">
+        <h1 class="game-title">
+            Arabic-English Matching Game<br>
+            لعبة المطابقة العربية الإنجليزية
+        </h1>
+    </header>
 
-        <div id="error-screen" style="display: none;">
-            <div class="error-message">
-                <h2>Error Loading Data</h2>
-                <p id="error-message">Unable to load ara.txt. Please make sure the file is in the same directory as this HTML file.</p>
+    <!-- Mode Selection Modal -->
+    <div class="modal fade" id="modeModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Choose Your Game</h5>
+                </div>
+                <div class="modal-body text-center">
+                    <button id="sentenceMode" class="btn btn-primary m-2">Sentence Matching</button>
+                    <button id="wordMode" class="btn btn-primary m-2">Word Matching</button>
+                    <button id="quranVerbsMode" class="btn btn-primary m-2">Quran Verbs Matching</button>
+                    <div id="loadingMessage" class="mt-2" style="display: none;">
+                        <div class="spinner-border text-primary" role="status" style="width: 1.5rem; height: 1.5rem;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span class="ms-2" style="font-family: 'Poppins', sans-serif; vertical-align: middle;">Loading...</span>
+                    </div>
+                </div>
             </div>
-        </div>
-        
-        <div id="setup-screen" style="display: none;">
-            <h2>Select Difficulty</h2>
-            <div class="difficulty-selector">
-                <label for="difficulty">Select Difficulty Level (1-10):</label>
-                <input type="range" id="difficulty" class="difficulty-slider" min="1" max="10" value="5">
-                <div class="difficulty-display">Current: <span id="difficulty-value">5</span> - <span id="difficulty-text">Intermediate</span></div>
-                <button class="start-button" id="start-game">Start Game</button>
-                <p id="data-stats" class="difficulty-display"></p>
-            </div>
-        </div>
-        
-        <div id="game-screen" style="display: none;">
-            <div class="question" id="arabic-text"></div>
-            <div class="feedback" id="feedback"></div>
-            <div class="options" id="options-container"></div>
-            <button class="next-button" id="next-question">Next Question</button>
         </div>
     </div>
 
-    <!-- Startup Modal -->
-    <div id="startModal" class="modal game-mode-modal">
-        <div class="modal-content">
-            <h2>Select Game Mode</h2>
-            <p>Choose the type of matching game you'd like to play:</p>
-            <div class="buttons-container">
-                <button id="sentenceGameButton" class="start-button sentence-button">Sentence Matching Game (Dialect Agnostic)</button>
-                <button id="wordGameButton" class="start-button word-button">Word Matching Game (Classical Arabic)</button>
+    <div class="modal fade" id="nextLevelModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <h5 id="nextLevelMessage"></h5>
+                </div>
             </div>
         </div>
     </div>
-    
-    <!-- Session Summary Modal -->
-    <div id="summary-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" id="close-modal">&times;</span>
-            <h2>Your Session Summary</h2>
-            <div class="session-stats">
-                <p><strong>Difficulty Level:</strong> <span id="summary-difficulty"></span></p>
-                <p><strong>Total Correct Answers:</strong> <span id="summary-correct"></span></p>
-                <p><strong>Total Mistakes:</strong> <span id="summary-mistakes"></span></p>
-                <p><strong>Success Rate:</strong> <span id="summary-rate"></span>%</p>
+    <div class="modal fade" id="endGameModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <h5>Game Over!</h5>
+                    <p id="correctAnswers"></p>
+                    <p id="incorrectAnswers"></p>
+                    <button id="playAgainButton" class="btn btn-primary">Play Again</button>
+                </div>
             </div>
-            <h3>Answer Log:</h3>
-            <div id="answer-log" class="log-container">
-                <!-- Log entries will be inserted here dynamically -->
-            </div>
+        </div>
+    </div>
+
+    <!-- Main Game Area -->
+    <div class="container mt-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2 id="levelDisplay">Level 1/10</h2>
             <div>
-                <h3>Copy Results:</h3>
-                <textarea id="copy-text" class="copy-area" readonly></textarea>
+                <span id="scoreDisplay">
+                    <span id="correctScore" style="color: #28a745;">Correct: 0</span> 
+                    <span id="incorrectScore" style="color: #dc3545;">Incorrect: 0</span>
+                </span>
+                <button id="doneButton" class="btn btn-danger ms-3">I'm Done</button>
             </div>
-            <div class="buttons-container">
-                <button id="download-log" class="download-button">Download Results</button>
-                <button id="new-game" class="start-button">New Game</button>
+        </div>
+        <div id="sliderContainer" class="mt-4 text-center">
+            <label id="levelLabel" for="levelSlider">Select Starting Level (1-10):</label>
+            <div id="levelDescription"></div> <!-- Add this line -->
+            <input type="range" class="form-range" id="levelSlider" min="1" max="10" value="1">
+            <button id="startButton" class="btn btn-success mt-3">Let's Play!</button>
+        </div>
+        <div id="gameArea" class="mt-4 text-center"></div>
+    </div>
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="infoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="infoModalLabel">Game Information</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>About the Game:</strong> The Arabic-English Matching Game is designed to help learners practice matching Arabic words and sentences with their English translations across different modes, including Sentence Matching, Word Matching, and Quran Verbs Matching.</p>
+                    <p><strong>Data Sources:</strong></p>
+                    <ul>
+                        <li><a href="https://alqalaminstitute.org" target="_blank">Al-Qalam Institute</a>: Wordlist extracted from the FSTU Arabic Textbooks</li>
+                        <li><a href="https://tatoeba.org" target="_blank">Tatoeba</a>: Provides sentence-based learning materials from Arabic speakers across the world. The data set used here is dialect agnostic.</li>
+                        <li><a href="https://corpus.quran.com" target="_blank">Quran Corpus</a>: Supplies verb and linguistic data from the Quran for the Quran Verbs mode.</li>
+                    </ul>
+                    <p><strong>Data Structure:</strong> The game uses CSV and text files with Arabic-English pairs. Sentence mode uses tab-separated files, Word mode pairs lines, and Quran Verbs mode uses comma-separated CSV files. More on data sources on my Github. Please let me know if you catch any errors/bugs!</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="scripts/compromise.min.js"></script>
+    <script src="scripts/config.js"></script>
+    <script src="scripts/fixedSets.js"></script>
+    <script src="scripts/state.js"></script>
+    <script src="scripts/preprocessing.js"></script>
+    <script src="scripts/game.js"></script>
+    <script src="scripts/main.js"></script>
+</body>
     <footer>
         TTS: <a href="https://responsivevoice.org" target="_blank">responsivevoice.org</a><br>
         Data: <a href="https://alqalaminstitute.org" target="_blank">alqalaminstitute.org</a>, 
-        <a href="https://tatoeba.org" target="_blank">tatoeba.org</a>
+        <a href="https://tatoeba.org" target="_blank">tatoeba.org</a>,
+        <a href="https://corpus.quran.com" target="_blank">corpus.quran.com</a><br>
+        <button id="infoButton" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#infoModal">
+            <i class="bi bi-info-circle-fill me-1"></i> More Info
+        </button>
     </footer>
-</body>
 </html>

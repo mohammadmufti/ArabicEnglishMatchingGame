@@ -1,4 +1,3 @@
-
 // Fisher-Yates shuffle function
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -15,7 +14,7 @@ function startGame() {
     state.currentLevel = parseInt(state.dom.levelSlider.value);
     console.log('Current level:', state.currentLevel);
     const segment = state.segments[state.currentLevel - 1];
-    shuffleArray(segment); // Shuffle the selected segment’s pairs
+    shuffleArray(segment); // Shuffle the selected segment's pairs
     console.log('Shuffled segment for level ' + state.currentLevel + ':', segment);
     displayLevel();
 }
@@ -26,6 +25,12 @@ function displayLevel() {
     // New reset logic
     state.dom.gameArea.innerHTML = ''; // Clear content first
     state.dom.gameArea.classList.remove('correct-answer', 'incorrect-answer', 'disabled-answer'); // Remove any lingering classes
+    
+    // Add and remove reset class to ensure clean slate
+    state.dom.gameArea.classList.add('reset');
+    setTimeout(() => {
+        state.dom.gameArea.classList.remove('reset');
+    }, 50);
 
     console.log('Displaying level:', state.currentLevel, 'Segment:', segment);
     if (!segment || segment.length === 0) {
@@ -41,6 +46,10 @@ function displayLevel() {
 function displayPair(pair, segment) {
     console.log('Displaying pair:', pair);
 
+    // Reset the game area to clear any previous state
+    state.dom.gameArea.innerHTML = '';
+    
+    // Apply reset class to clear any lingering state
     state.dom.gameArea.classList.add('reset');
     setTimeout(() => {
         state.dom.gameArea.classList.remove('reset');
@@ -245,6 +254,10 @@ function displayPair(pair, segment) {
     
     // Add event listeners to buttons
     state.dom.gameArea.querySelectorAll('button:not(.speak-btn)').forEach(btn => {
+        // Make sure button is in default state but don't add question-reset which would prevent highlighting
+        btn.disabled = false;
+        btn.classList.remove('correct-answer', 'incorrect-answer', 'disabled-answer');
+        
         btn.addEventListener('click', () => checkAnswer(btn.textContent, pair, segment));
     });
 }
@@ -354,6 +367,11 @@ function checkAnswer(selected, pair, segment) {
     const clickedButton = Array.from(buttons).find(btn => btn.textContent === selected);
     const correctButton = Array.from(buttons).find(btn => btn.textContent === pair.english);
 
+    // Make sure all buttons are clean before applying new styles
+    buttons.forEach(btn => {
+        btn.classList.remove('question-reset');
+    });
+
     if (isCorrect) {
         clickedButton.classList.add('correct-answer');
     } else {
@@ -374,18 +392,26 @@ function checkAnswer(selected, pair, segment) {
 
     const nextIndex = segment.indexOf(pair) + 1;
     if (nextIndex < segment.length) {
-        if (isCorrect) {
+        // Function to reset all button states and move to next question
+        const moveToNextQuestion = () => {
             displayPair(segment[nextIndex], segment);
+        };
+        
+        if (isCorrect) {
+            // For correct answers, show feedback briefly before moving on
+            setTimeout(moveToNextQuestion, 500);
         } else {
-            setTimeout(() => {
-                displayPair(segment[nextIndex], segment);
-            }, gameConfig.INCORRECT_DELAY);
+            // For incorrect answers, use the configured delay
+            setTimeout(moveToNextQuestion, gameConfig.INCORRECT_DELAY);
         }
     } else {
         state.currentLevel++;
         if (state.currentLevel > state.maxLevels) {
             if (isCorrect) {
-                endGame();
+                // For correct answers, show feedback briefly before ending
+                setTimeout(() => {
+                    endGame();
+                }, 500);
             } else {
                 setTimeout(() => {
                     endGame();
@@ -395,7 +421,9 @@ function checkAnswer(selected, pair, segment) {
             const nextSegment = state.segments[state.currentLevel - 1];
             shuffleArray(nextSegment);
             console.log('Shuffled segment for level ' + state.currentLevel + ':', nextSegment);
-            const transitionDelay = isCorrect ? 0 : gameConfig.INCORRECT_DELAY;
+            const transitionDelay = isCorrect ? 500 : gameConfig.INCORRECT_DELAY;
+            
+            // Transition after feedback delay
             setTimeout(() => {
                 anime({
                     targets: '#gameArea',

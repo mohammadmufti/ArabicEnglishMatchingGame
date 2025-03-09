@@ -86,7 +86,7 @@ body {
 }
 #startButton {
     margin-top: 1.5rem; /* Space above the button */
-    display: block; /* Ensure it’s a block element */
+    display: block; /* Ensure it's a block element */
     margin-left: auto;
     margin-right: auto;
 }
@@ -221,15 +221,32 @@ body {
     box-shadow: 0 2px 8px rgba(107, 72, 255, 0.2); /* Default shadow */
 }
 /* Post selection issue*/
-#gameArea.reset button {
-    -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
-    background: none !important;
-    color: #6b48ff !important;
-    border-color: #6b48ff !important;
-    transform: none !important;
-    box-shadow: 0 2px 8px rgba(107, 72, 255, 0.2) !important;
-    animation: none !important;
-    transition: none !important;
+#gameArea.reset button:not(.correct-answer):not(.incorrect-answer) {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    background: none;
+    color: #6b48ff;
+    border-color: #6b48ff;
+    transform: none;
+    box-shadow: 0 2px 8px rgba(107, 72, 255, 0.2);
+    animation: none;
+    transition: none;
+    /* Ensure no lingering styles from previous selections */
+    opacity: 1;
+    pointer-events: auto;
+    cursor: pointer;
+}
+
+/* Explicitly reset individual buttons when transitioning questions */
+#gameArea button.question-reset {
+    background: none;
+    color: #6b48ff;
+    border-color: #6b48ff;
+    opacity: 1;
+    transform: none;
+    box-shadow: 0 2px 8px rgba(107, 72, 255, 0.2);
+    animation: none;
+    pointer-events: auto;
+    cursor: pointer;
 }
 
 .disabled-answer {
